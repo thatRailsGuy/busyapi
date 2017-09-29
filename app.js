@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -13,6 +14,21 @@ var app = express();
 // simple in-memory usage store
 var usages = [];
 app.usages = usages;
+
+app.mongoose = mongoose;
+
+mongoose.connect('mongodb://localhost/usagedb', { useMongoClient: true, promiseLibrary: global.Promise });
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+var usageSchema = mongoose.Schema({
+	patientId: { type: Number, index: true },
+	timestamp: { type: Date},
+	medication: { type: String }
+});
+
+app.usageSchema = usageSchema;
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,6 +47,7 @@ app.use('/users', users);
 
 // API
 require('./routes/api/usages')(app);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,12 +1,10 @@
 module.exports = function(app){
     app.post('/api/usages', function(req, res){
 
-        // Store the supplied usage data
-        app.usages.push(req.body);
+    	var Usage = app.mongoose.model('Usage', app.usageSchema);
 
-        var usageId = app.usages.length;
-        console.log('Stored usage count: ' + usageId);
+    	usage = new Usage(req.body)
 
-        res.status(201).json({'id':usageId});
+        res.status(201).json({'id':usage._id});
     });
 }
